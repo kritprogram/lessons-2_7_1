@@ -1,24 +1,26 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import type { Todo } from "../hooks/useTodos";
 import { FaEdit, FaSave, FaTrash, FaWindowClose } from "react-icons/fa";
+import { AppContext } from "../context";
 
 interface TodoItemProps {
   todo: Todo;
-  onUpdate: (todo: Todo) => void;
-  onDelete: (id: number) => void;
 }
 
-const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
+const TodoItem = ({ todo }: TodoItemProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editingTitle, setEditingTitle] = useState<string>(todo.title);
 
+  const context = useContext(AppContext);
+  if (!context) return null;
+  const { updateTodo, deleteTodo } = context;
   const handleSave = () => {
-    onUpdate({ ...todo, title: editingTitle });
+    updateTodo({ ...todo, title: editingTitle });
     setIsEditing(false);
   };
 
   const handleToggleCompleted = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ ...todo, completed: e.target.checked });
+    updateTodo({ ...todo, completed: e.target.checked });
   };
 
   return (
@@ -70,7 +72,7 @@ const TodoItem = ({ todo, onUpdate, onDelete }: TodoItemProps) => {
           </button>
           <button
             className="delete-btn"
-            onClick={() => onDelete(todo.id)}
+            onClick={() => deleteTodo(todo.id)}
             title="Удалить"
           >
             <FaTrash />
